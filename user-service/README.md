@@ -79,6 +79,90 @@ Client → WSO2 Gateway (OAuth2) → X-User-Id header → User Service → MySQL
 
 The WSO2 API Gateway handles OAuth2. Internal services trust the `X-User-Id` header forwarded by the gateway. When testing directly (bypassing the gateway), you set this header manually.
 
+## Layered Architecture Diagram
+
+```
+                     HTTP Request
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────┐
+│                 GatewayAuthInterceptor              │  ← security/
+│  Validates X-User-Id header, stashes UUID as attr   │
+└──────────────────────┬──────────────────────────────┘
+                       │ passes through
+┌──────────────────────▼──────────────────────────────┐
+│                  UserController                     │  ← controller/
+│  receive HTTP → call service → return response.     |
+| No logic, no try/catch.                             │
+└──────────────────────┬──────────────────────────────┘
+                       │ delegates to interface
+┌──────────────────────▼──────────────────────────────┐
+│               UserService (interface)               │  ← service/
+│  Contract: register(), login(), getProfile()        │
+└──────────────────────┬──────────────────────────────┘
+                       │ implemented by
+┌──────────────────────▼──────────────────────────────┐
+│               UserServiceImpl                       │  ← service/impl/
+│  ALL business logic lives here:                     │
+│  • Password hashing via PasswordEncoder (BCrypt)    │
+│  • Login credential validation                      │
+│  • Status checks (active/suspended)                 │
+│  • Calls repository → gets entity → calls mapper →  │
+│    returns DTO                                      │
+└──┬──────────────┬──────────────┬────────────────────┘
+   │              │              │
+   ▼              ▼              ▼
+┌─────────┐ ┌──────────┐ ┌──────────┐
+│UserRepo │ │Password  │ │UserMapper│
+│(JPA)    │ │Encoder   │ │          │
+└────┬────┘ └──────────┘ └────┬─────┘
+     │                        │
+     ▼                        ▼
+┌─────────┐           ┌───────────────┐
+│   DB    │           │    DTOs       │
+│ (MySQL) │           │ • RegisterReq │
+└─────────┘           │ • LoginReq    │
+                      │ • UserRegResp │
+                      │ • LoginResp   │
+                      │ • ProfileResp │
+                      └───────────────┘
+```
+
+## Data Flow Diagram For A Request - POST /users/register
+
+```
+Client sends JSON body
+       │
+       ▼
+Tomcat receives on port 8081
+       │
+       ▼
+UserController.register(@Valid @RequestBody RegisterRequest)
+       │  Jackson deserializes JSON → RegisterRequest POJO
+       │  @Valid triggers Bean Validation constraints
+       │  (if validation fails → GlobalExceptionHandler returns 400)
+       ▼
+UserService.register(RegisterRequest)   ← depends on interface, not impl
+       │
+       ▼
+UserServiceImpl.register()
+       ├── userRepository.existsByUsername()  ← checks DB
+       ├── userRepository.existsByEmail()     ← checks DB  
+       ├── passwordEncoder.encode(password)   ← BCrypt hash
+       ├── User.builder()...build()           ← creates entity
+       ├── userRepository.save(user)          ← inserts to MySQL
+       └── userMapper.toRegisteredResponse()  ← entity → DTO
+       │
+       ▼
+Returns UserRegisteredResponse DTO  ← never exposes entity
+       │
+       ▼
+Controller wraps in ResponseEntity.status(CREATED)
+       │
+       ▼
+Jackson serializes DTO → JSON response to client
+```
+
 ## Ports
 
 User Service uses port `8081`.
