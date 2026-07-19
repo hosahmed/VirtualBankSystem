@@ -1,0 +1,30 @@
+server:
+  port:
+    8081 # each microservice gets its own fixed port for local dev;
+    # account-service should use 8082, transaction-service 8083, etc.
+    # Keep a shared port map in docs/PORTS.md as the team adds services.
+
+spring:
+  application:
+    name: user-service
+
+  datasource:
+    url: jdbc:mysql://localhost:5555/vbank_users?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: vbank_user
+    password: vbank_pass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    show-sql: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    com.vbank.userservice: DEBUG
+    org.hibernate.SQL: DEBUG
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

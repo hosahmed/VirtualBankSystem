@@ -1,13 +1,12 @@
-package com.example.virtualbanksystem;
+package com.vbank.userservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class VirtualBankSystemApplication {
+public class UserServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(VirtualBankSystemApplication.class, args);
+        SpringApplication.run(UserServiceApplication.class, args);
     }
-
 }

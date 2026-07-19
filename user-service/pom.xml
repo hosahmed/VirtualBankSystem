@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        Inherits from the team's real parent POM (com.example:VirtualBankSystem),
+        not a standalone spring-boot-starter-parent. This is the fix requested:
+        previously this module pointed at its own separate parent chain.
+
+        Because the grandparent is spring-boot-starter-parent:4.1.0, Spring
+        Boot's own BOM still manages versions for everything below - the
+        team's dependencyManagement block on top of that just adds/overrides
+        a few specific coordinates (mysql-connector-j, lombok, the modular
+        test starters). We don't repeat versions here for anything already
+        covered by either BOM.
+    -->
+    <parent>
+        <groupId>com.example</groupId>
+        <artifactId>VirtualBankSystem</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>user-service</artifactId>
+    <packaging>jar</packaging>
+    <name>user-service</name>
+    <description>User identity, authentication, and profile microservice</description>
+
+    <dependencies>
+        <!-- Spring Boot 4 renamed this: spring-boot-starter-web is
+             deprecated in favor of spring-boot-starter-webmvc, which is
+             what the parent's dependencyManagement declares. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- Not in the parent's dependencyManagement block, but still
+             version-managed transitively via spring-boot-starter-parent's
+             own BOM (the parent's parent), same as every other
+             un-versioned spring-boot-starter-* here. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- Still deliberately NOT spring-boot-starter-security, even
+             though the parent makes it available - see the note below
+             the dependency list for why. -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Version now comes from the parent's dependencyManagement -
+             see root pom.xml for why it's centralized there. -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Kept for fast, dependency-free unit/slice tests even though
+             runtime uses MySQL. For integration tests that must catch
+             MySQL-specific SQL behavior, prefer Testcontainers with a
+             real MySQL image over relying on H2 compatibility mode -
+             flagging this rather than adding Testcontainers now, since
+             that's a bigger addition worth a team decision. -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>user-service</finalName>
+    </build>
+</project>
