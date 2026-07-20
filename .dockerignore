@@ -1,0 +1,9 @@
+.git
+.idea
+target
+*.iml
+.mvn
+mvnw
+mvnw.cmd
+user-service/target
+user-service/*.iml
