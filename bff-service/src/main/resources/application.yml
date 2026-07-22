@@ -1,0 +1,28 @@
+server:
+  port: 8084   # recorded in docs/PORTS.md
+
+spring:
+  application:
+    name: bff-service
+
+# Base URLs for the services this BFF aggregates. Deliberately
+# externalized here (not hardcoded in Java) - when the real
+# Account/Transaction services turn out to run on different
+# hosts/ports than assumed, this is a one-line change, not a
+# code change. Override via env vars in each environment
+# (local/docker/staging) rather than editing this file per-environment.
+services:
+  user-service:
+    base-url: ${USER_SERVICE_URL:http://localhost:8081}
+  account-service:
+    base-url: ${ACCOUNT_SERVICE_URL:http://localhost:8082}
+  transaction-service:
+    base-url: ${TRANSACTION_SERVICE_URL:http://localhost:8083}
+
+logging:
+  level:
+    com.vbank.bffservice: DEBUG
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

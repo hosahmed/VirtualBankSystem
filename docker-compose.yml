@@ -28,5 +28,20 @@ services:
       - vbank-user-db
     restart: unless-stopped
 
+  bff-service:
+    build:
+      context: .
+      dockerfile: bff-service/Dockerfile
+    container_name: bff-service
+    ports:
+      - "8084:8084"
+    environment:
+      - USER_SERVICE_URL=http://user-service:8081
+      - ACCOUNT_SERVICE_URL=http://account-service:8082
+      - TRANSACTION_SERVICE_URL=http://transaction-service:8083
+    depends_on:
+      - user-service
+    restart: unless-stopped
+
 volumes:
   mysql_data:
