@@ -8,5 +8,5 @@ package com.vbank.userservice.entity;
  */
 public enum UserStatus {
     ACTIVE,
-    SUSPENDED
+    INACTIVE
 }

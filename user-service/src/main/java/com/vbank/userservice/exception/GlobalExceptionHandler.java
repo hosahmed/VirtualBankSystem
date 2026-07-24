@@ -31,20 +31,13 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
+
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException ex) {
-        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
-    }
-
-    @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException ex) {
-        return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {

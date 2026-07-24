@@ -8,6 +8,8 @@ spring:
   application:
     name: user-service
 
+
+
   datasource:
     url: jdbc:mysql://localhost:5555/vbank_users?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: vbank_user
@@ -20,6 +22,12 @@ spring:
     hibernate:
       ddl-auto: update
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
 logging:
   level:
     com.vbank.userservice: DEBUG
@@ -28,3 +36,5 @@ logging:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+

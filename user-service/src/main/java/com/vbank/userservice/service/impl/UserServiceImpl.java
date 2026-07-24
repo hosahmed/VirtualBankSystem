@@ -80,6 +80,8 @@ public class UserServiceImpl implements UserService {
         return userMapper.toLoginResponse(user);
     }
 
+
+
     @Override
     public UserProfileResponse getProfile(UUID userId) {
         User user = userRepository.findById(userId)

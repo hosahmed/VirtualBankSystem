@@ -24,6 +24,7 @@ public class UserMapper {
                 .build();
     }
 
+
     public UserProfileResponse toProfileResponse(User user) {
         return UserProfileResponse.builder()
                 .userId(user.getUserId())

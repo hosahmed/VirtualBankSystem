@@ -1,25 +1,22 @@
 package com.vbank.userservice.config;
 
-import com.vbank.userservice.security.GatewayAuthInterceptor;
+import com.vbank.userservice.interceptor.AppNameInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * Register the interceptor ONLY on the profile endpoint.
- */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    private final GatewayAuthInterceptor gatewayAuthInterceptor;
+    private final AppNameInterceptor appNameInterceptor;
 
-    public WebConfig(GatewayAuthInterceptor gatewayAuthInterceptor) {
-        this.gatewayAuthInterceptor = gatewayAuthInterceptor;
+    public WebConfig(AppNameInterceptor appNameInterceptor) {
+        this.appNameInterceptor = appNameInterceptor;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(gatewayAuthInterceptor)
-                .addPathPatterns("/users/*/profile");
+        registry.addInterceptor(appNameInterceptor)
+                .addPathPatterns("/**"); // Applies to all endpoints
     }
 }

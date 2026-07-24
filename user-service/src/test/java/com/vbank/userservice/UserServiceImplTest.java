@@ -160,7 +160,7 @@ class UserServiceImplTest {
                                 .userId(UUID.randomUUID())
                                 .username("john.doe")
                                 .passwordHash("hashed-password")
-                                .status(UserStatus.SUSPENDED)
+                                .status(UserStatus.INACTIVE)
                                 .build();
 
                 when(userRepository.findByUsername("john.doe")).thenReturn(java.util.Optional.of(user));

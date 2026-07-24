@@ -1,7 +1,6 @@
 package com.vbank.userservice.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -14,11 +13,11 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
         )
 )
 @SecurityScheme(
-        name = "X-User-Id",
-        type = SecuritySchemeType.APIKEY,
-        in = SecuritySchemeIn.HEADER,
-        paramName = "X-User-Id",
-        description = "Authenticated user ID forwarded by WSO2 API Gateway. Required for the profile endpoint."
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT",
+        description = "JWT token provided by WSO2 API Gateway."
 )
 public class OpenApiConfig {
 }
