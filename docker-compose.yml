@@ -15,6 +15,20 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  vbank-account-db:
+    image: mysql:8.0
+    container_name: vbank-account-db
+    ports:
+      - "5556:3306"
+    environment:
+      MYSQL_DATABASE: vbank_accounts
+      MYSQL_USER: vbank_user
+      MYSQL_PASSWORD: vbank_pass
+      MYSQL_ROOT_PASSWORD: root_password
+    restart: unless-stopped
+    volumes:
+      - mysql_account_data:/var/lib/mysql
+
   user-service:
     build:
       context: .
@@ -27,6 +41,21 @@ services:
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       - vbank-user-db
+      - kafka
+    restart: unless-stopped
+
+  account-service:
+    build:
+      context: .
+      dockerfile: account-service/Dockerfile
+    container_name: account-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://vbank-account-db:3306/vbank_accounts?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - vbank-account-db
       - kafka
     restart: unless-stopped
 
@@ -57,3 +86,4 @@ services:
 
 volumes:
   mysql_data:
+  mysql_account_data:
