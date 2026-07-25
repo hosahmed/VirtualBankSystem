@@ -29,6 +29,20 @@ services:
     volumes:
       - mysql_account_data:/var/lib/mysql
 
+  vbank-transaction-db:
+    image: mysql:8.0
+    container_name: vbank-transaction-db
+    ports:
+      - "5557:3306"
+    environment:
+      MYSQL_DATABASE: vbank_transactions
+      MYSQL_USER: vbank_user
+      MYSQL_PASSWORD: vbank_pass
+      MYSQL_ROOT_PASSWORD: root_password
+    restart: unless-stopped
+    volumes:
+      - mysql_transaction_data:/var/lib/mysql
+
   user-service:
     build:
       context: .
@@ -59,6 +73,23 @@ services:
       - kafka
     restart: unless-stopped
 
+  transaction-service:
+    build:
+      context: .
+      dockerfile: transaction-service/Dockerfile
+    container_name: transaction-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://vbank-transaction-db:3306/vbank_transactions?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - ACCOUNT_SERVICE_URL=http://account-service:8082
+    depends_on:
+      - vbank-transaction-db
+      - kafka
+      - account-service
+    restart: unless-stopped
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     container_name: zookeeper
@@ -87,3 +118,4 @@ services:
 volumes:
   mysql_data:
   mysql_account_data:
+  mysql_transaction_data:

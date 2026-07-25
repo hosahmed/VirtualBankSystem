@@ -15,6 +15,7 @@
     <modules>
         <module>user-service</module>
         <module>account-service</module>
+        <module>transaction-service</module>
     </modules>
     <name>VirtualBankSystem</name>
     <description>VirtualBankSystem</description>
