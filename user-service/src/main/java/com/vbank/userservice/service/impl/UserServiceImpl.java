@@ -19,9 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-/**
- * All business logic lives here.
- */
+// All business logic lives here. Controllers are thin by design.
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -69,6 +67,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid username or password."));
 
+        // Same generic message for wrong password, missing user, or
+        // suspended account — no hint about which field is wrong.
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             throw new InvalidCredentialsException("Invalid username or password.");
         }

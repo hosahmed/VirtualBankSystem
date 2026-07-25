@@ -26,6 +26,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
+// Thin controller: receives HTTP, delegates to service, returns response.
 public class UserController {
 
     private final UserService userService;
