@@ -18,10 +18,22 @@
         Transaction services for the frontend/gateway consumer.</description>
 
     <dependencies>
+        <!-- Exposes the BFF's own REST endpoints (e.g. /bff/dashboard/{userId})
+             to the gateway/frontend. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
+
+        <!-- WebClient lives here. We use it for OUTBOUND calls to
+             User/Account/Transaction Service even though this service's
+             own inbound API is synchronous MVC (webmvc above) - that
+             combination (blocking MVC controller, reactive WebClient
+             calls collected with .block() at the boundary) is a common
+             and supported pattern, and simpler for a small team than
+             going fully reactive (WebFlux end-to-end) for one endpoint
+             that needs parallel fan-out. If this service grows more
+             high-concurrency aggregation endpoints, revisit full WebFlux. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
@@ -30,6 +42,18 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- Producer side of the project's Kafka logging requirement
+             (spec section 5) - every microservice must publish a
+             {message, messageType, dateTime} envelope for each
+             request/response to a shared topic, consumed by
+             logging-service. This was the gap flagged when
+             logging-service was scaffolded - see
+             logging/RequestResponseLoggingFilter.java. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-kafka</artifactId>
         </dependency>
 
         <dependency>

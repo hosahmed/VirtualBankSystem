@@ -5,6 +5,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
+/**
+ * One WebClient bean per downstream service, each pre-configured with
+ * that service's base URL from application.yml. Kept as separate
+ * beans (not one generic WebClient + string concatenation at call
+ * time) so each client class gets an already-scoped WebClient
+ * injected - no risk of a typo building the wrong URL inline in
+ * business code.
+ */
 @Configuration
 public class WebClientConfig {
 

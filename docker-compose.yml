@@ -126,11 +126,45 @@ services:
       - USER_SERVICE_URL=http://user-service:8081
       - ACCOUNT_SERVICE_URL=http://account-service:8082
       - TRANSACTION_SERVICE_URL=http://transaction-service:8083
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       - user-service
+      - account-service
+      - transaction-service
+      - kafka
     restart: unless-stopped
+
+  logging-service:
+    build:
+      context: .
+      dockerfile: logging-service/Dockerfile
+    container_name: logging-service
+    ports:
+      - "8085:8085"
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_DATASOURCE_URL=jdbc:mysql://vbank-log-db:3306/vbank_logs?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    depends_on:
+      - vbank-log-db
+      - kafka
+    restart: unless-stopped
+
+  vbank-log-db:
+    image: mysql:8.0
+    container_name: vbank-log-db
+    ports:
+      - "5558:3306"
+    environment:
+      MYSQL_DATABASE: vbank_logs
+      MYSQL_USER: vbank_user
+      MYSQL_PASSWORD: vbank_pass
+      MYSQL_ROOT_PASSWORD: root_password
+    restart: unless-stopped
+    volumes:
+      - mysql_log_data:/var/lib/mysql
 
 volumes:
   mysql_data:
   mysql_account_data:
   mysql_transaction_data:
+  mysql_log_data:

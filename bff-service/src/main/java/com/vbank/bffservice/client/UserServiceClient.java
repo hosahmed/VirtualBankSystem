@@ -11,9 +11,13 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-// Calls User Service's profile endpoint. Sets X-User-Id because this
-// BFF sits on the trusted side of the gateway boundary — User Service
-// expects that header even for internal callers.
+/**
+ * IMPORTANT: this client does NOT call User Service's /login or
+ * /register - only the read-only /profile endpoint the dashboard
+ * needs. A BFF client class should only expose what its actual
+ * callers need, not mirror a downstream service's entire API surface -
+ * that keeps this class's purpose obvious at a glance.
+ */
 @Component
 public class UserServiceClient {
 
@@ -24,6 +28,12 @@ public class UserServiceClient {
     }
 
     public Mono<UserProfileDto> getProfile(UUID userId) {
+        // User Service's GatewayAuthInterceptor requires X-User-Id to
+        // be present AND to match the requested {userId} path variable
+        // (see UserController.getProfile's ownership check). The BFF
+        // sits on the trusted side of that boundary - same as the
+        // gateway - so it must set this header itself when calling on
+        // a user's behalf, forwarding the same ID being requested.
         return webClient.get()
                 .uri("/users/{userId}/profile", userId)
                 .header("X-User-Id", userId.toString())

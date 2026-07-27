@@ -1,6 +1,5 @@
 package com.vbank.bffservice.dto.response;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,23 +7,23 @@ import lombok.Setter;
 
 import java.util.UUID;
 
+/**
+ * Deserialization target for User Service's GET /users/{userId}/profile
+ * response. This is an ASSUMPTION about User Service's real contract -
+ * it matches the spec's documented example and the actual User Service
+ * we built (see user-service/README.md). If your friend's Account/
+ * Transaction services are what's uncertain here, this class isn't
+ * affected - it's the one downstream contract we know for certain
+ * because we built it ourselves.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserProfileDto {
-    @Schema(example = "a1b2c3d4-e5f6-7890-1234-567890abcdef")
     private UUID userId;
-
-    @Schema(example = "john.doe")
     private String username;
-
-    @Schema(example = "john.doe@example.com")
     private String email;
-
-    @Schema(example = "John")
     private String firstName;
-
-    @Schema(example = "Doe")
     private String lastName;
 }

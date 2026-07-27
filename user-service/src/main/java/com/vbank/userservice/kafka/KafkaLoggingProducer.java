@@ -1,19 +1,30 @@
 package com.vbank.userservice.kafka;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class KafkaLoggingProducer {
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
-    private static final String TOPIC = "logging-topic";
+    private static final Logger log = LoggerFactory.getLogger(KafkaLoggingProducer.class);
 
-    public KafkaLoggingProducer(KafkaTemplate<String, Object> kafkaTemplate) {
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final String topic;
+
+    public KafkaLoggingProducer(KafkaTemplate<String, Object> kafkaTemplate,
+                                @Value("${app.kafka.logging-topic}") String topic) {
         this.kafkaTemplate = kafkaTemplate;
+        this.topic = topic;
     }
 
     public void sendLog(LogMessage logMessage) {
-        kafkaTemplate.send(TOPIC, logMessage);
+        try {
+            kafkaTemplate.send(topic, logMessage);
+        } catch (Exception e) {
+            log.warn("Failed to publish log message to Kafka", e);
+        }
     }
 }

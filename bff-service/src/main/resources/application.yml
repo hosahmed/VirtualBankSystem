@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: bff-service
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 # Base URLs for the services this BFF aggregates. Deliberately
 # externalized here (not hardcoded in Java) - when the real
@@ -18,6 +23,13 @@ services:
     base-url: ${ACCOUNT_SERVICE_URL:http://localhost:8082}
   transaction-service:
     base-url: ${TRANSACTION_SERVICE_URL:http://localhost:8083}
+
+# MUST match logging-service's application.yml exactly - see the
+# warning comment there. A typo here means messages vanish silently,
+# no error on either side.
+app:
+  kafka:
+    logging-topic: logging
 
 logging:
   level:
