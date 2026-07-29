@@ -20,5 +20,9 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
+app:
+  kafka:
+    logging-topic: logging
+
 account-service:
   url: ${ACCOUNT_SERVICE_URL:http://localhost:8082}

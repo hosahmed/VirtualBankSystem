@@ -33,8 +33,10 @@ logging:
     com.vbank.userservice: DEBUG
     org.hibernate.SQL: DEBUG
 
+app:
+  kafka:
+    logging-topic: logging
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-
-

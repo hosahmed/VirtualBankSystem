@@ -24,6 +24,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
+/**
+ * Pure unit test - mocks the three downstream clients so no real
+ * network call happens. Verifies the AGGREGATION logic (combining
+ * results, propagating specific failure types) - not the HTTP
+ * details, which live in the client classes themselves and would be
+ * tested separately with something like MockWebServer if we add that
+ * later.
+ */
 class DashboardServiceImplTest {
 
     @Mock

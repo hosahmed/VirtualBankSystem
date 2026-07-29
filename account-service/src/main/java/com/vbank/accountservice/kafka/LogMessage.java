@@ -10,12 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LogMessage {
-    private String traceId;
-    private String serviceName;
-    private String method;
-    private String uri;
-    private String requestBody;
-    private int responseStatus;
-    private String responseBody;
-    private long durationMs;
+    private String message;
+    private String messageType;
+    private String dateTime;
 }

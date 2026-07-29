@@ -1,12 +1,9 @@
 package com.vbank.bffservice.controller;
 
 import com.vbank.bffservice.dto.response.DashboardResponse;
-import com.vbank.bffservice.exception.ErrorResponse;
 import com.vbank.bffservice.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,13 +35,10 @@ public class BffController {
                     + "history (Transaction Service) into a single response. "
                     + "Account and transaction lookups run in parallel.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Dashboard assembled successfully",
-                    content = @Content(schema = @Schema(implementation = DashboardResponse.class))),
-            @ApiResponse(responseCode = "404", description = "No user exists with the given ID",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Dashboard assembled successfully"),
+            @ApiResponse(responseCode = "404", description = "No user exists with the given ID"),
             @ApiResponse(responseCode = "500", description = "A downstream service (User/Account/Transaction) "
-                    + "failed or timed out during aggregation",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    + "failed or timed out during aggregation")
     })
     public ResponseEntity<DashboardResponse> getDashboard(
             @Parameter(description = "ID of the user whose dashboard is being requested")

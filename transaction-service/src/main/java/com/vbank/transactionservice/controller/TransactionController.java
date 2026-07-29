@@ -5,9 +5,14 @@ import com.vbank.transactionservice.dto.request.TransferInitiationRequest;
 import com.vbank.transactionservice.dto.response.TransactionHistoryResponse;
 import com.vbank.transactionservice.dto.response.TransferExecutionResponse;
 import com.vbank.transactionservice.dto.response.TransferInitiationResponse;
+import com.vbank.transactionservice.exception.ErrorResponse;
 import com.vbank.transactionservice.service.TransactionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,12 +20,21 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequiredArgsConstructor
+@Tag(name = "Transaction Service", description = "Financial transfers and transaction history")
 public class TransactionController {
 
     private final TransactionService transactionService;
 
+    public TransactionController(TransactionService transactionService) {
+        this.transactionService = transactionService;
+    }
+
     @PostMapping("/transactions/transfer/initiation")
+    @Operation(summary = "Initiate a fund transfer")
+    @ApiResponse(responseCode = "200", description = "Transfer initiated",
+            content = @Content(schema = @Schema(implementation = TransferInitiationResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid accounts or insufficient funds",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<TransferInitiationResponse> initiateTransfer(
             @Valid @RequestBody TransferInitiationRequest request) {
         TransferInitiationResponse response = transactionService.initiateTransfer(request);
@@ -28,6 +42,11 @@ public class TransactionController {
     }
 
     @PostMapping("/transactions/transfer/execution")
+    @Operation(summary = "Execute an initiated transfer")
+    @ApiResponse(responseCode = "200", description = "Transfer executed",
+            content = @Content(schema = @Schema(implementation = TransferExecutionResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid transaction ID or insufficient funds",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<TransferExecutionResponse> executeTransfer(
             @Valid @RequestBody TransferExecutionRequest request) {
         TransferExecutionResponse response = transactionService.executeTransfer(request);
@@ -35,6 +54,10 @@ public class TransactionController {
     }
 
     @GetMapping("/accounts/{accountId}/transactions")
+    @Operation(summary = "Get transaction history for an account")
+    @ApiResponse(responseCode = "200", description = "Transaction history")
+    @ApiResponse(responseCode = "404", description = "No transactions found",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<List<TransactionHistoryResponse>> getTransactionHistory(
             @PathVariable UUID accountId) {
         List<TransactionHistoryResponse> response = transactionService.getTransactionHistory(accountId);

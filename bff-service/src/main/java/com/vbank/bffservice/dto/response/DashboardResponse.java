@@ -1,6 +1,5 @@
 package com.vbank.bffservice.dto.response;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,24 +7,22 @@ import lombok.Getter;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * This class - not UserProfileDto/AccountDto/TransactionDto - is the
+ * BFF's OWN public contract, the thing the frontend/gateway actually
+ * depends on. The Dto classes above are internal deserialization
+ * targets for calls to other services and could change shape without
+ * this class changing, as long as the mapper absorbs the difference.
+ * That boundary is the whole point of the BFF pattern.
+ */
 @Getter
 @Builder
 @AllArgsConstructor
 public class DashboardResponse {
-    @Schema(example = "a1b2c3d4-e5f6-7890-1234-567890abcdef")
     private UUID userId;
-
-    @Schema(example = "john.doe")
     private String username;
-
-    @Schema(example = "john.doe@example.com")
     private String email;
-
-    @Schema(example = "John")
     private String firstName;
-
-    @Schema(example = "Doe")
     private String lastName;
-
     private List<AccountWithTransactionsDto> accounts;
 }

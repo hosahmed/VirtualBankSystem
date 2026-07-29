@@ -1,0 +1,38 @@
+server:
+  port: 8085 # recorded in docs/PORTS.md
+
+spring:
+  application:
+    name: logging-service
+
+  datasource:
+    url: jdbc:mysql://localhost:5558/vbank_logs?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    username: ${DB_USERNAME:vbank_user}
+    password: ${DB_PASSWORD:vbank_pass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: logging-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+app:
+  kafka:
+    logging-topic: logging
+
+logging:
+  level:
+    com.vbank.loggingservice: DEBUG
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

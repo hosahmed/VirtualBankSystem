@@ -10,6 +10,9 @@ import reactor.core.publisher.Flux;
 
 import java.util.UUID;
 
+/**
+ * ASSUMED CONTRACT - see AccountServiceClient's note; same caveat.
+ */
 @Component
 public class TransactionServiceClient {
 
