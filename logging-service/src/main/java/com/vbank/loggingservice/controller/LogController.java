@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vbank.loggingservice.dto.LogMessageDto;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/logs")
@@ -54,7 +55,7 @@ public class LogController {
     @Operation(summary = "Test log ingestion",
             description = "Manually push a log message via HTTP as if it came from Kafka")
     @ApiResponse(responseCode = "200", description = "Log ingested successfully")
-    public ResponseEntity<String> testIngestLog(@RequestBody LogMessageDto logMessageDto) throws Exception {
+    public ResponseEntity<String> testIngestLog(@Valid @RequestBody LogMessageDto logMessageDto) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         String rawMessage = mapper.writeValueAsString(logMessageDto);

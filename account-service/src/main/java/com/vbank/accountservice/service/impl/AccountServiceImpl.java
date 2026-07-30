@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vbank.accountservice.client.UserServiceClient;
 import java.time.Instant;
 import java.util.List;
 import java.util.Random;
@@ -30,6 +31,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
+    private final UserServiceClient userServiceClient;
 
     @Override
     @Transactional
@@ -44,6 +46,8 @@ public class AccountServiceImpl implements AccountService {
         if (type != AccountType.SAVINGS && type != AccountType.CHECKING) {
             throw new InvalidAccountRequestException("Account type must be SAVINGS or CHECKING");
         }
+
+        userServiceClient.validateUserExists(request.getUserId());
 
         String accountNumber = generateUniqueAccountNumber();
 
