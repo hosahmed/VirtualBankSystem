@@ -67,10 +67,6 @@ To properly secure the application, you must import the APIs into WSO2 and set u
 ## 🧪 Testing
 
 You can test the application natively through **Postman**:
-1. Export the Postman Collection directly from the WSO2 Developer Portal (under the Try Out tab).
-2. Import the `.json` file into Postman.
-3. Configure your Bearer Token in the Authorization tab.
-4. Add the `APP-NAME: PORTAL` (or `MOBILE`) header to your requests to pass the custom WSO2 Synapse mediation policies and Spring Boot interceptors.
+1. Import the `.json` file into Postman.
+2. Configure your Bearer Token in the Authorization tab.
 
----
-*Developed for the Virtual Bank Internship Project.*
