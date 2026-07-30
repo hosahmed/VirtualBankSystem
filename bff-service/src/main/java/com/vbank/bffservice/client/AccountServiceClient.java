@@ -9,13 +9,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Flux;
 
 import java.util.UUID;
-
-/**
- * ASSUMED CONTRACT - endpoint path and response shape follow the
- * spec's documented GET /users/{userId}/accounts. Not yet verified
- * against the real Account Service implementation - reconcile once
- * that code is available (see bff-service/README.md).
- */
 @Component
 public class AccountServiceClient {
 
@@ -30,11 +23,6 @@ public class AccountServiceClient {
                 .uri("/users/{userId}/accounts", userId)
                 .retrieve()
                 .bodyToFlux(AccountDto.class)
-                // Per spec, Account Service returns 404 when a user has
-                // zero accounts - that's a normal case (e.g. a
-                // brand-new user right after registration), not a
-                // failure, so we treat it as an empty list rather than
-                // propagating an error for the whole dashboard.
                 .onErrorResume(WebClientResponseException.NotFound.class, ex -> Flux.empty())
                 .onErrorMap(ex -> !(ex instanceof DownstreamServiceException),
                         ex -> new DownstreamServiceException("Call to Account Service failed.", ex));

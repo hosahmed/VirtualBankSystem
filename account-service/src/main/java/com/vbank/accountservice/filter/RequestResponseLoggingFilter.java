@@ -45,7 +45,10 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
 
         String now = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
 
-        if (requestBody != null && !requestBody.isBlank()) {
+        if (!requestBody.isBlank()) {
+            if (requestBody.length() > 10000) {
+                requestBody = requestBody.substring(0, 10000) + "... [TRUNCATED]";
+            }
             kafkaLoggingProducer.sendLog(LogMessage.builder()
                     .message(requestBody)
                     .messageType("Request")
@@ -53,7 +56,10 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
                     .build());
         }
 
-        if (responseBody != null && !responseBody.isBlank()) {
+        if (!responseBody.isBlank()) {
+            if (responseBody.length() > 10000) {
+                responseBody = responseBody.substring(0, 10000) + "... [TRUNCATED]";
+            }
             kafkaLoggingProducer.sendLog(LogMessage.builder()
                     .message(responseBody)
                     .messageType("Response")

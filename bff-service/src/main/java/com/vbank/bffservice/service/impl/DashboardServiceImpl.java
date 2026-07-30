@@ -10,37 +10,15 @@ import com.vbank.bffservice.dto.response.UserProfileDto;
 import com.vbank.bffservice.exception.DownstreamServiceException;
 import com.vbank.bffservice.service.DashboardService;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * This is the ONE class in the whole project allowed to call multiple
- * other microservices - that's the entire point of the BFF pattern
- * (see docs/OPENCODE.md §2). User Service, Account Service, and
- * Transaction Service never call each other; this orchestration layer
- * is where cross-service composition is supposed to live.
- *
- * Follows the spec's documented 4-step process for GET
- * /bff/dashboard/{userId} exactly:
- *   1. profile from User Service
- *   2. accounts from Account Service
- *   3. for each account, transactions from Transaction Service - IN
- *      PARALLEL, per the spec's explicit "asynchronously" wording
- *   4. combine into one response
- */
 @Service
 public class DashboardServiceImpl implements DashboardService {
 
-    // A hard timeout on the whole aggregation is deliberate: without
-    // one, a single slow downstream call (Account or Transaction
-    // Service hanging) would make this endpoint hang indefinitely,
-    // even though WebClient calls are individually non-blocking. 5s is
-    // a starting point for local dev - tune per real network latency
-    // once this runs against actual deployed services.
     private static final Duration AGGREGATION_TIMEOUT = Duration.ofSeconds(5);
 
     private final UserServiceClient userServiceClient;

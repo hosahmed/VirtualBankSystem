@@ -32,10 +32,6 @@ public class LogEntry {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
-
-    // Lob/TEXT, not a bounded VARCHAR - this holds an escaped JSON
-    // request or response body of arbitrary size (e.g. a dashboard
-    // response with many accounts and transactions).
     @Lob
     @Column(name = "message", nullable = false, columnDefinition = "TEXT")
     private String message;

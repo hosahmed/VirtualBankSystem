@@ -20,32 +20,6 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Implements spec section "Request and Response Logging in
- * Microservices" for this service: after each request is processed
- * and just before the response is sent, publish a
- * {message, messageType, dateTime} envelope to Kafka for both the
- * request and the response.
- *
- * WHY a filter, not an interceptor or AOP aspect: a servlet Filter
- * runs outside Spring MVC's dispatch entirely, so it captures every
- * request that hits this service, including ones that fail before
- * reaching a controller (e.g. a 404 for an unmapped path) or that a
- * future interceptor might short-circuit. Logging is exactly the kind
- * of cross-cutting concern that should not depend on which handler
- * ends up processing the request.
- *
- * INTEGRATION NOTE FOR OPENCODE: this is ONE possible implementation
- * of the spec's logging requirement, written without visibility into
- * how User/Account/Transaction Service actually implemented theirs.
- * If they used a different mechanism (e.g. an interceptor, or a
- * different envelope-building helper class), this filter's OUTPUT
- * envelope shape must still match logging-service's expected
- * {message, messageType, dateTime} format exactly - that's the only
- * hard requirement, not the mechanism used to produce it. See
- * docs/OPENCODE.md's Kafka logging section for the full audit
- * checklist.
- */
 @Component
 public class RequestResponseLoggingFilter extends OncePerRequestFilter {
 
@@ -56,10 +30,9 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
     private final String loggingTopic;
 
     public RequestResponseLoggingFilter(KafkaTemplate<String, String> kafkaTemplate,
-                                         ObjectMapper objectMapper,
                                          @Value("${app.kafka.logging-topic}") String loggingTopic) {
         this.kafkaTemplate = kafkaTemplate;
-        this.objectMapper = objectMapper;
+        this.objectMapper = new ObjectMapper();
         this.loggingTopic = loggingTopic;
     }
 
@@ -67,6 +40,13 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                      HttpServletResponse response,
                                      FilterChain filterChain) throws ServletException, IOException {
+
+        String uri = request.getRequestURI();
+        if (uri.startsWith("/v3/api-docs") || uri.startsWith("/swagger-ui") || uri.startsWith("/webjars")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(request, 1024 * 10);
         ContentCachingResponseWrapper wrappedResponse = new ContentCachingResponseWrapper(response);
 
@@ -110,6 +90,12 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
 
     private void publish(String content, String messageType, Instant dateTime) {
         try {
+            // Truncate overly large payloads (like Swagger UI assets) to prevent
+            // Kafka RecordTooLargeException and DB TEXT column truncation errors.
+            if (content != null && content.length() > 10000) {
+                content = content.substring(0, 10000) + "... [TRUNCATED]";
+            }
+
             Map<String, Object> envelope = new LinkedHashMap<>();
             envelope.put("message", content);
             envelope.put("messageType", messageType);

@@ -10,9 +10,6 @@ import reactor.core.publisher.Flux;
 
 import java.util.UUID;
 
-/**
- * ASSUMED CONTRACT - see AccountServiceClient's note; same caveat.
- */
 @Component
 public class TransactionServiceClient {
 
@@ -27,8 +24,6 @@ public class TransactionServiceClient {
                 .uri("/accounts/{accountId}/transactions", accountId)
                 .retrieve()
                 .bodyToFlux(TransactionDto.class)
-                // Same reasoning as AccountServiceClient: a new account
-                // with zero transactions yet is normal, not an error.
                 .onErrorResume(WebClientResponseException.NotFound.class, ex -> Flux.empty())
                 .onErrorMap(ex -> !(ex instanceof DownstreamServiceException),
                         ex -> new DownstreamServiceException("Call to Transaction Service failed.", ex));

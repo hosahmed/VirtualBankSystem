@@ -27,3 +27,6 @@ app:
 scheduler:
   stale-account:
     interval: 3600000 # 1 hour
+
+user-service:
+  url: ${USER_SERVICE_URL:http://localhost:8081}

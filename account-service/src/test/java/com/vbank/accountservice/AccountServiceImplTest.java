@@ -11,6 +11,7 @@ import com.vbank.accountservice.entity.AccountType;
 import com.vbank.accountservice.exception.AccountNotFoundException;
 import com.vbank.accountservice.exception.InsufficientFundsException;
 import com.vbank.accountservice.exception.InvalidAccountRequestException;
+import com.vbank.accountservice.client.UserServiceClient;
 import com.vbank.accountservice.mapper.AccountMapper;
 import com.vbank.accountservice.repository.AccountRepository;
 import com.vbank.accountservice.service.impl.AccountServiceImpl;
@@ -39,12 +40,15 @@ class AccountServiceImplTest {
     @Mock
     private AccountMapper accountMapper;
 
+    @Mock
+    private UserServiceClient userServiceClient;
+
     private AccountServiceImpl accountService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        accountService = new AccountServiceImpl(accountRepository, accountMapper);
+        accountService = new AccountServiceImpl(accountRepository, accountMapper, userServiceClient);
     }
 
     @Test
