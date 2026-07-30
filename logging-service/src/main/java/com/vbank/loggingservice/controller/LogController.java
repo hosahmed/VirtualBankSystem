@@ -13,9 +13,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.vbank.loggingservice.dto.LogMessageDto;
 
 @RestController
 @RequestMapping("/logs")
@@ -36,12 +41,24 @@ public class LogController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<Page<LogEntryResponse>> getLogs(
             @RequestParam(required = false) String messageType,
-            Pageable pageable) {
+            @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LogMessageType type = messageType == null ? null
                 : LogMessageType.fromWireValue(messageType);
         Page<LogEntryResponse> page = type == null
                 ? logEntryService.findAll(pageable)
                 : logEntryService.findByMessageType(type, pageable);
         return ResponseEntity.ok(page);
+    }
+
+    @PostMapping
+    @Operation(summary = "Test log ingestion",
+            description = "Manually push a log message via HTTP as if it came from Kafka")
+    @ApiResponse(responseCode = "200", description = "Log ingested successfully")
+    public ResponseEntity<String> testIngestLog(@RequestBody LogMessageDto logMessageDto) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        String rawMessage = mapper.writeValueAsString(logMessageDto);
+        logEntryService.ingest(rawMessage);
+        return ResponseEntity.ok("Log ingested successfully via HTTP");
     }
 }
