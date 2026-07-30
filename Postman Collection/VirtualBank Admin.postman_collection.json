@@ -1,0 +1,749 @@
+{
+  "info": {
+    "_postman_id": "2db2f1c3-e5e2-48e4-9c94-0ddef01fa7bd",
+    "name": "VirtualBank Admin",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37122086"
+  },
+  "item": [
+    {
+      "name": "User Service",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "accept",
+                "value": "*/*"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "APP-NAME",
+                "value": "MOBILE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"john.doe\",\n  \"password\": \"securePassword123\",\n  \"email\": \"john.doe@example.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:8243/testbank/1.0.0/users/register",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8243",
+              "path": [
+                "testbank",
+                "1.0.0",
+                "users",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "accept",
+                "value": "*/*"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "APP-NAME",
+                "value": "MOBILE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"string\",\n  \"password\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:8243/testbank/1.0.0/users/login",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8243",
+              "path": [
+                "testbank",
+                "1.0.0",
+                "users",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "accept",
+                "value": "*/*"
+              },
+              {
+                "key": "APP-NAME",
+                "value": "MOBILE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8243/testbank/1.0.0/users/{{User-ID}}/profile",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8243",
+              "path": [
+                "testbank",
+                "1.0.0",
+                "users",
+                "{{User-ID}}",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Account Service",
+      "item": [
+        {
+          "name": "Transfer Funds",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "accept",
+                "value": "*/*"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "APP-NAME",
+                "value": "MOBILE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromAccountId\": \"f1e2d3c4-b5a6-9876-5432-10fedcba9876\",\n  \"toAccountId\": \"a1b2c3d4-e5f6-7890-1234-567890abcdef\",\n  \"amount\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:8243/testbank/1.0.0/accounts/transfer",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8243",
+              "path": [
+                "testbank",
+                "1.0.0",
+                "accounts",
+                "transfer"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New Bank Account",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "accept",
+                "value": "*/*"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "APP-NAME",
+                "value": "MOBILE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"a1b2c3d4-e5f6-7890-1234-567890abcdef\",\n  \"accountType\": \"SAVINGS\",\n  \"initialBalance\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:8243/testbank/1.0.0/accounts",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8243",
+              "path": [
+                "testbank",
+                "1.0.0",
+                "accounts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Accounts For UserId",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "accept",
+                "value": "*/*"
+              },
+              {
+                "key": "APP-NAME",
+                "value": "MOBILE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8243/testbank/1.0.0/users/{{userId}}/accounts",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8243",
+              "path": [
+                "testbank",
+                "1.0.0",
+                "users",
+                "{{userId}}",
+                "accounts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Account Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "accept",
+                "value": "*/*"
+              },
+              {
+                "key": "APP-NAME",
+                "value": "MOBILE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8243/testbank/1.0.0/accounts/{{accountId}}",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8243",
+              "path": [
+                "testbank",
+                "1.0.0",
+                "accounts",
+                "{{accountId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Transaction Service",
+      "item": [
+        {
+          "name": "Initiate Transaction",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              },
+              {
+                "key": "APP-NAME",
+                "value": "MOBILE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"fromAccountId\": \"98248322-7a75-4b8c-874d-f08b0a665f62\",\n    \"toAccountId\": \"694a5030-ed95-4a1a-8415-82b5db3fede0\",\n    \"amount\": 30,\n    \"description\": \"Transfer to checking account\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:8243/testbank/1.0.0/transactions/transfer/initiation",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8243",
+              "path": [
+                "testbank",
+                "1.0.0",
+                "transactions",
+                "transfer",
+                "initiation"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Execute Transaction",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              },
+              {
+                "key": "APP-NAME",
+                "value": "MOBILE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"transactionId\": \"c062561d-b5b3-4593-9823-047c1484fe79\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:8243/testbank/1.0.0/transactions/transfer/execution",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8243",
+              "path": [
+                "testbank",
+                "1.0.0",
+                "transactions",
+                "transfer",
+                "execution"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transaction History",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "accept",
+                "value": "*/*"
+              },
+              {
+                "key": "APP-NAME",
+                "value": "MOBILE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8243/testbank/1.0.0/accounts/{{accountId}}/transactions",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8243",
+              "path": [
+                "testbank",
+                "1.0.0",
+                "accounts",
+                "{{accountId}}",
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Logging Service",
+      "item": [
+        {
+          "name": "List log entries",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              },
+              {
+                "key": "APP-NAME",
+                "value": "MOBILE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8243/testbank/1.0.0/logs?messageType=Request&page=0&size=20",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8243",
+              "path": [
+                "testbank",
+                "1.0.0",
+                "logs"
+              ],
+              "query": [
+                {
+                  "key": "messageType",
+                  "value": "Request"
+                },
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Zero-based page index (0..N)"
+                },
+                {
+                  "key": "size",
+                  "value": "20",
+                  "description": "The size of the page to be returned"
+                }
+              ]
+            },
+            "description": "Optionally filter by messageType (Request/Response). Paginated."
+          },
+          "response": []
+        },
+        {
+          "name": "Test log ingestion",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              },
+              {
+                "key": "APP-NAME",
+                "value": "MOBILE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"empty\": true,\n    \"message\": \"Test\",\n    \"messageType\": \"Request\",\n    \"dateTime\": \"2026-07-30T13:53:59.234091Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:8243/testbank/1.0.0/logs",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8243",
+              "path": [
+                "testbank",
+                "1.0.0",
+                "logs"
+              ]
+            },
+            "description": "Manually push a log message via HTTP as if it came from Kafka"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "BFF Service",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              },
+              {
+                "key": "APP-NAME",
+                "value": "MOBILE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8243/testbank/1.0.0/bff/dashboard/{{userId}}",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8243",
+              "path": [
+                "testbank",
+                "1.0.0",
+                "bff",
+                "dashboard",
+                "{{userId}}"
+              ]
+            },
+            "description": "Combines profile (User Service), accounts (Account Service), and each account's transaction history (Transaction Service) into a single response. Account and transaction lookups run in parallel."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Get Admin Access Token",
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "password",
+              "value": "{{Admin Secret Key}}",
+              "type": "string"
+            },
+            {
+              "key": "username",
+              "value": "mvb4F2JxidTLAgYzG0GQTOMqQN0a",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "type": "text",
+              "key": "grant_type",
+              "value": "password"
+            },
+            {
+              "type": "text",
+              "key": "username",
+              "value": "admin"
+            },
+            {
+              "type": "text",
+              "key": "password",
+              "value": "admin"
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://localhost:9443/oauth2/token",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "9443",
+          "path": [
+            "oauth2",
+            "token"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
