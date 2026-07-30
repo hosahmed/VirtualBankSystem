@@ -54,16 +54,22 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
 
         String now = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
 
-        if (requestBody != null && !requestBody.isBlank()) {
-            String sanitizedRequest = redactSensitiveFields(requestBody);
+        if (!requestBody.isBlank()) {
+            requestBody = redactSensitiveFields(requestBody);
+            if (requestBody.length() > 10000) {
+                requestBody = requestBody.substring(0, 10000) + "... [TRUNCATED]";
+            }
             kafkaLoggingProducer.sendLog(LogMessage.builder()
-                    .message(sanitizedRequest)
+                    .message(requestBody)
                     .messageType("Request")
                     .dateTime(now)
                     .build());
         }
 
-        if (responseBody != null && !responseBody.isBlank()) {
+        if (!responseBody.isBlank()) {
+            if (responseBody.length() > 10000) {
+                responseBody = responseBody.substring(0, 10000) + "... [TRUNCATED]";
+            }
             kafkaLoggingProducer.sendLog(LogMessage.builder()
                     .message(responseBody)
                     .messageType("Response")
@@ -75,9 +81,7 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
         responseWrapper.copyBodyToResponse();
     }
 
-    /**
-     * Redacts the "password" field from a JSON request body before logging.
-     */
+
     private String redactSensitiveFields(String body) {
         try {
             JsonNode node = objectMapper.readTree(body);

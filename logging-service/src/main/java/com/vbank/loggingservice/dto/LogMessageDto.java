@@ -8,11 +8,6 @@ import lombok.Setter;
 
 import java.time.Instant;
 
-/**
- * Deserialization target for the Kafka message body every other
- * microservice publishes, per the spec's exact format:
- * { "message": "...", "messageType": "Request"|"Response", "dateTime": "..." }
- */
 @Getter
 @Setter
 @NoArgsConstructor

@@ -19,11 +19,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DownstreamServiceException.class)
     public ResponseEntity<ErrorResponse> handleDownstreamFailure(DownstreamServiceException ex) {
-        // The real cause (which service, what error) is logged here,
-        // server-side only - never surfaced in the response body. This
-        // matches the spec's documented 500 example exactly:
-        // "Failed to retrieve dashboard data due to an issue with
-        // downstream services."
         log.error("Downstream service call failed during dashboard aggregation", ex);
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR,
                 "Failed to retrieve dashboard data due to an issue with downstream services.");

@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.stream.Collectors;
 
-// Translates every exception type the service can throw into a
-// consistent {status, error, message} JSON shape.
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
