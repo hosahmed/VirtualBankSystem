@@ -1,0 +1,152 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Logging Service API",
+        "description": "Kafka consumer that persists request/response logs from every other microservice into a dump table. The primary interface is the Kafka topic, not HTTP - the endpoints here are a read-only query addition, not the spec's core requirement.",
+        "contact": {
+            "name": "Virtual Bank System Team"
+        },
+        "version": "v1"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8085",
+            "description": "Generated server url"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Logs",
+            "description": "Read-only queries over the log dump table (addition beyond spec minimum)"
+        }
+    ],
+    "paths": {
+        "/logs": {
+            "get": {
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "List log entries",
+                "description": "Optionally filter by messageType (Request/Response). Paginated.",
+                "operationId": "getLogs",
+                "parameters": [
+                    {
+                        "name": "messageType",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "pageable",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/Pageable"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of log entries",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LogEntryResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Pageable": {
+                "type": "object",
+                "properties": {
+                    "page": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0
+                    },
+                    "size": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 1
+                    },
+                    "sort": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "LogEntryResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": {
+                            "userId": "a1b2c3d4-..."
+                        }
+                    },
+                    "messageType": {
+                        "type": "string",
+                        "enum": [
+                            "Request",
+                            "Response"
+                        ],
+                        "example": "Request"
+                    },
+                    "dateTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-15T07:16:49.822Z"
+                    },
+                    "receivedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-15T07:16:50.000Z"
+                    }
+                }
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 500
+                    },
+                    "error": {
+                        "type": "string",
+                        "example": "Internal Server Error"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "An unexpected error occurred."
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,316 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Account Service API",
+        "description": "API documentation for the Virtual Bank Account Service",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8082",
+            "description": "Generated server url"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Account Service",
+            "description": "Manage bank accounts — create, retrieve, transfer"
+        }
+    ],
+    "paths": {
+        "/accounts/transfer": {
+            "put": {
+                "tags": [
+                    "Account Service"
+                ],
+                "summary": "Transfer funds between accounts",
+                "operationId": "transfer",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransferRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Transfer completed",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransferResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid accounts or insufficient funds",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/accounts": {
+            "post": {
+                "tags": [
+                    "Account Service"
+                ],
+                "summary": "Create a new bank account",
+                "operationId": "createAccount",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateAccountRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Account created",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AccountCreatedResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid account type or initial balance",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{userId}/accounts": {
+            "get": {
+                "tags": [
+                    "Account Service"
+                ],
+                "summary": "List all accounts for a user",
+                "operationId": "getAccountsByUserId",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of accounts",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AccountDetailsResponse"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No accounts found for user",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/accounts/{accountId}": {
+            "get": {
+                "tags": [
+                    "Account Service"
+                ],
+                "summary": "Get account details by ID",
+                "operationId": "getAccount",
+                "parameters": [
+                    {
+                        "name": "accountId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Account details",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AccountDetailsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Account not found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "TransferRequest": {
+                "type": "object",
+                "properties": {
+                    "fromAccountId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "f1e2d3c4-b5a6-9876-5432-10fedcba9876"
+                    },
+                    "toAccountId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "example": 100.0,
+                        "minimum": 0.01
+                    }
+                },
+                "required": [
+                    "amount",
+                    "fromAccountId",
+                    "toAccountId"
+                ]
+            },
+            "TransferResponse": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Account updated successfully."
+                    }
+                }
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 404
+                    },
+                    "error": {
+                        "type": "string",
+                        "example": "Not Found"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Account not found."
+                    }
+                }
+            },
+            "CreateAccountRequest": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                    },
+                    "accountType": {
+                        "type": "string",
+                        "example": "SAVINGS",
+                        "minLength": 1
+                    },
+                    "initialBalance": {
+                        "type": "number",
+                        "example": 100.0,
+                        "minimum": 0.0
+                    }
+                },
+                "required": [
+                    "accountType",
+                    "initialBalance",
+                    "userId"
+                ]
+            },
+            "AccountCreatedResponse": {
+                "type": "object",
+                "properties": {
+                    "accountId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "f1e2d3c4-b5a6-9876-5432-10fedcba9876"
+                    },
+                    "accountNumber": {
+                        "type": "string",
+                        "example": "1234567890"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Account created successfully."
+                    }
+                }
+            },
+            "AccountDetailsResponse": {
+                "type": "object",
+                "properties": {
+                    "accountId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "f1e2d3c4-b5a6-9876-5432-10fedcba9876"
+                    },
+                    "accountNumber": {
+                        "type": "string",
+                        "example": "1234567890"
+                    },
+                    "accountType": {
+                        "type": "string",
+                        "example": "SAVINGS"
+                    },
+                    "balance": {
+                        "type": "number",
+                        "example": 100.0
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "ACTIVE"
+                    }
+                }
+            }
+        }
+    }
+}

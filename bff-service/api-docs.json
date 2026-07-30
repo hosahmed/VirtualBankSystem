@@ -1,0 +1,164 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "BFF Service API",
+        "description": "Backend for Frontend - aggregates User, Account, and Transaction services into frontend-optimized responses. This is the only service that calls other microservices directly; see docs/OPENCODE.md for why.",
+        "contact": {
+            "name": "Virtual Bank System Team"
+        },
+        "version": "v1"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8084",
+            "description": "Generated server url"
+        }
+    ],
+    "tags": [
+        {
+            "name": "BFF",
+            "description": "Aggregated endpoints for the frontend - the only place in this system that calls multiple other microservices directly"
+        }
+    ],
+    "paths": {
+        "/bff/dashboard/{userId}": {
+            "get": {
+                "tags": [
+                    "BFF"
+                ],
+                "summary": "Get the aggregated dashboard for a user",
+                "description": "Combines profile (User Service), accounts (Account Service), and each account's transaction history (Transaction Service) into a single response. Account and transaction lookups run in parallel.",
+                "operationId": "getDashboard",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID of the user whose dashboard is being requested",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dashboard assembled successfully",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DashboardResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No user exists with the given ID",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DashboardResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "A downstream service (User/Account/Transaction) failed or timed out during aggregation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DashboardResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AccountWithTransactionsDto": {
+                "type": "object",
+                "properties": {
+                    "accountId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "accountNumber": {
+                        "type": "string"
+                    },
+                    "accountType": {
+                        "type": "string"
+                    },
+                    "balance": {
+                        "type": "number"
+                    },
+                    "transactions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TransactionDto"
+                        }
+                    }
+                }
+            },
+            "DashboardResponse": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "username": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "accounts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AccountWithTransactionsDto"
+                        }
+                    }
+                }
+            },
+            "TransactionDto": {
+                "type": "object",
+                "properties": {
+                    "transactionId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "fromAccountId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "toAccountId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "amount": {
+                        "type": "number"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "deliveryStatus": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
