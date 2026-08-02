@@ -66,6 +66,17 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/accounts/{accountId}/exists")
+    @Operation(summary = "Check if an account exists")
+    @ApiResponse(responseCode = "200", description = "Account exists")
+    @ApiResponse(responseCode = "404", description = "Account not found",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public ResponseEntity<Void> checkAccountExists(@PathVariable UUID accountId) {
+        accountService.getAccount(accountId);
+        return ResponseEntity.ok().build();
+    }
+
     @PreAuthorize("hasRole('ADMIN') or @accountSecurity.isOwner(authentication.principal, #request.fromAccountId)")
     @PutMapping("/accounts/transfer")
     @Operation(summary = "Transfer funds between accounts")

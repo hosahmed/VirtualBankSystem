@@ -18,9 +18,10 @@ public class AccountServiceClient {
         this.webClient = webClient;
     }
 
-    public Flux<AccountDto> getAccountsForUser(UUID userId) {
+    public Flux<AccountDto> getAccountsForUser(UUID userId, String token) {
         return webClient.get()
                 .uri("/users/{userId}/accounts", userId)
+                .header("X-Auth-Token", token)
                 .retrieve()
                 .bodyToFlux(AccountDto.class)
                 .onErrorResume(WebClientResponseException.NotFound.class, ex -> Flux.empty())

@@ -17,6 +17,9 @@ public class AccountDetailsResponse {
     @Schema(example = "f1e2d3c4-b5a6-9876-5432-10fedcba9876")
     private UUID accountId;
 
+    @Schema(example = "a1b2c3d4-e5f6-7890-1234-56789abcdef0")
+    private UUID userId;
+
     @Schema(example = "1234567890")
     private String accountNumber;
 

@@ -55,11 +55,24 @@ public class AccountServiceClient {
     }
 
     /**
-     * Validates that an account exists by calling GET /accounts/{accountId}.
+     * Validates that an account exists by calling GET /accounts/{accountId}/exists.
      * Throws InvalidTransactionException if the account is not found.
      */
     public void validateAccountExists(UUID accountId) {
-        getAccount(accountId);
+        try {
+            restClient.get()
+                    .uri("/accounts/{accountId}/exists", accountId)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                        throw new InvalidTransactionException("Account not found: " + accountId);
+                    })
+                    .toBodilessEntity();
+        } catch (InvalidTransactionException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error validating account {}: {}", accountId, e.getMessage());
+            throw new InvalidTransactionException("Failed to validate account: " + accountId);
+        }
     }
 
     /**

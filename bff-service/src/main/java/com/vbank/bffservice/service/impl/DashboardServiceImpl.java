@@ -34,12 +34,12 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public DashboardResponse getDashboard(UUID userId) {
-        Mono<UserProfileDto> profileMono = userServiceClient.getProfile(userId);
+    public DashboardResponse getDashboard(UUID userId, String token) {
+        Mono<UserProfileDto> profileMono = userServiceClient.getProfile(userId, token);
 
         Mono<List<AccountWithTransactionsDto>> accountsWithTransactionsMono =
-                accountServiceClient.getAccountsForUser(userId)
-                        .flatMap(this::withTransactions, /* concurrency */ 8)
+                accountServiceClient.getAccountsForUser(userId, token)
+                        .flatMap(account -> withTransactions(account, token), /* concurrency */ 8)
                         .collectList();
 
         // Mono.zip runs the profile call and the accounts-with-
@@ -57,8 +57,8 @@ public class DashboardServiceImpl implements DashboardService {
                 .block();
     }
 
-    private Mono<AccountWithTransactionsDto> withTransactions(AccountDto account) {
-        return transactionServiceClient.getTransactionsForAccount(account.getAccountId())
+    private Mono<AccountWithTransactionsDto> withTransactions(AccountDto account, String token) {
+        return transactionServiceClient.getTransactionsForAccount(account.getAccountId(), token)
                 .collectList()
                 .map(transactions -> AccountWithTransactionsDto.builder()
                         .accountId(account.getAccountId())

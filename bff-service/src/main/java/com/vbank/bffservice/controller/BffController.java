@@ -44,8 +44,9 @@ public class BffController {
     })
     public ResponseEntity<DashboardResponse> getDashboard(
             @Parameter(description = "ID of the user whose dashboard is being requested")
-            @PathVariable UUID userId) {
-        DashboardResponse response = dashboardService.getDashboard(userId);
+            @PathVariable UUID userId,
+            @org.springframework.web.bind.annotation.RequestHeader("X-Auth-Token") String token) {
+        DashboardResponse response = dashboardService.getDashboard(userId, token);
         return ResponseEntity.ok(response);
     }
 }

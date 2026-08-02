@@ -55,6 +55,7 @@ class DashboardServiceImplTest {
     void getDashboard_shouldAggregateProfileAccountsAndTransactions() {
         UUID userId = UUID.randomUUID();
         UUID accountId = UUID.randomUUID();
+        String token = "mock-token";
 
         UserProfileDto profile = new UserProfileDto(userId, "john.doe", "john.doe@example.com", "John", "Doe");
         AccountDto account = new AccountDto(accountId, "1234567890", "SAVINGS", BigDecimal.valueOf(120.00), "ACTIVE");
@@ -62,11 +63,11 @@ class DashboardServiceImplTest {
                 UUID.randomUUID(), null, accountId, BigDecimal.valueOf(50.00),
                 "Cash deposit", java.time.Instant.now(), "SENT");
 
-        when(userServiceClient.getProfile(userId)).thenReturn(Mono.just(profile));
-        when(accountServiceClient.getAccountsForUser(userId)).thenReturn(Flux.just(account));
-        when(transactionServiceClient.getTransactionsForAccount(accountId)).thenReturn(Flux.just(transaction));
+        when(userServiceClient.getProfile(userId, token)).thenReturn(Mono.just(profile));
+        when(accountServiceClient.getAccountsForUser(userId, token)).thenReturn(Flux.just(account));
+        when(transactionServiceClient.getTransactionsForAccount(accountId, token)).thenReturn(Flux.just(transaction));
 
-        DashboardResponse response = dashboardService.getDashboard(userId);
+        DashboardResponse response = dashboardService.getDashboard(userId, token);
 
         assertThat(response.getUsername()).isEqualTo("john.doe");
         assertThat(response.getAccounts()).hasSize(1);
@@ -78,13 +79,14 @@ class DashboardServiceImplTest {
     @Test
     void getDashboard_shouldReturnEmptyAccountsList_whenUserHasNoAccounts() {
         UUID userId = UUID.randomUUID();
+        String token = "mock-token";
         UserProfileDto profile = new UserProfileDto(userId, "new.user", "new.user@example.com", "New", "User");
 
-        when(userServiceClient.getProfile(userId)).thenReturn(Mono.just(profile));
+        when(userServiceClient.getProfile(userId, token)).thenReturn(Mono.just(profile));
         // Mirrors AccountServiceClient's own 404-to-empty-Flux translation.
-        when(accountServiceClient.getAccountsForUser(userId)).thenReturn(Flux.empty());
+        when(accountServiceClient.getAccountsForUser(userId, token)).thenReturn(Flux.empty());
 
-        DashboardResponse response = dashboardService.getDashboard(userId);
+        DashboardResponse response = dashboardService.getDashboard(userId, token);
 
         assertThat(response.getAccounts()).isEmpty();
     }
@@ -92,24 +94,26 @@ class DashboardServiceImplTest {
     @Test
     void getDashboard_shouldPropagateUserNotFound_whenProfileCallFails() {
         UUID userId = UUID.randomUUID();
-        when(userServiceClient.getProfile(userId))
+        String token = "mock-token";
+        when(userServiceClient.getProfile(userId, token))
                 .thenReturn(Mono.error(new UpstreamUserNotFoundException("not found")));
-        when(accountServiceClient.getAccountsForUser(userId)).thenReturn(Flux.empty());
+        when(accountServiceClient.getAccountsForUser(userId, token)).thenReturn(Flux.empty());
 
-        assertThatThrownBy(() -> dashboardService.getDashboard(userId))
+        assertThatThrownBy(() -> dashboardService.getDashboard(userId, token))
                 .isInstanceOf(UpstreamUserNotFoundException.class);
     }
 
     @Test
     void getDashboard_shouldPropagateDownstreamFailure_whenAccountServiceFails() {
         UUID userId = UUID.randomUUID();
+        String token = "mock-token";
         UserProfileDto profile = new UserProfileDto(userId, "john.doe", "john.doe@example.com", "John", "Doe");
 
-        when(userServiceClient.getProfile(userId)).thenReturn(Mono.just(profile));
-        when(accountServiceClient.getAccountsForUser(userId))
+        when(userServiceClient.getProfile(userId, token)).thenReturn(Mono.just(profile));
+        when(accountServiceClient.getAccountsForUser(userId, token))
                 .thenReturn(Flux.error(new DownstreamServiceException("Account Service down", new RuntimeException())));
 
-        assertThatThrownBy(() -> dashboardService.getDashboard(userId))
+        assertThatThrownBy(() -> dashboardService.getDashboard(userId, token))
                 .isInstanceOf(DownstreamServiceException.class);
     }
 }

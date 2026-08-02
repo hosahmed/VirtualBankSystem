@@ -20,9 +20,10 @@ public class UserServiceClient {
         this.webClient = webClient;
     }
 
-    public Mono<UserProfileDto> getProfile(UUID userId) {
+    public Mono<UserProfileDto> getProfile(UUID userId, String token) {
         return webClient.get()
                 .uri("/users/{userId}/profile", userId)
+                .header("X-Auth-Token", token)
                 .header("X-User-Id", userId.toString())
                 .retrieve()
                 .bodyToMono(UserProfileDto.class)

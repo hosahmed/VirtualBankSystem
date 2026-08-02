@@ -16,8 +16,7 @@ import java.util.UUID;
 @Component
 public class JwtTokenProvider {
 
-    // In a real app, this should be externally configured and securely stored.
-    // For this project, we hardcode a valid 256-bit base64 secret to avoid complex setup.
+    // For this project, I hardcoded a valid 256-bit base64 secret to avoid complex setup.
     private final String jwtSecret = "dGhpcyBpcyBhIHZhbGlkIDMyIGJ5dGUga2V5ISEhMTI=";
     private final long jwtExpirationInMs = 3600000; // 1 hour
 

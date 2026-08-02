@@ -10,9 +10,11 @@ import java.util.UUID;
 public class TransactionSecurity {
 
     private final AccountServiceClient accountServiceClient;
+    private final com.vbank.transactionservice.repository.TransactionRepository transactionRepository;
 
-    public TransactionSecurity(AccountServiceClient accountServiceClient) {
+    public TransactionSecurity(AccountServiceClient accountServiceClient, com.vbank.transactionservice.repository.TransactionRepository transactionRepository) {
         this.accountServiceClient = accountServiceClient;
+        this.transactionRepository = transactionRepository;
     }
 
     public boolean isOwner(String principal, UUID accountId) {
@@ -26,9 +28,23 @@ public class TransactionSecurity {
                 return account.get("userId").toString().equals(principal);
             }
         } catch (Exception e) {
-            // Log and fall through to return false
+            System.err.println("Error in TransactionSecurity.isOwner calling account-service:");
+            e.printStackTrace();
         }
         
         return false;
+    }
+
+    public boolean isTransactionOwner(String principal, UUID transactionId) {
+        if (principal == null || transactionId == null) {
+            return false;
+        }
+
+        com.vbank.transactionservice.entity.Transaction transaction = transactionRepository.findById(transactionId).orElse(null);
+        if (transaction == null) {
+            return false;
+        }
+
+        return isOwner(principal, transaction.getFromAccountId());
     }
 }

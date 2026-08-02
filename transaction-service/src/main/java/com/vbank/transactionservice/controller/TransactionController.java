@@ -43,10 +43,8 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 
-    // This is an internal-only endpoint called by the Saga orchestrator or directly, 
-    // but in our simplified architecture we might allow ADMIN to execute or it's called by internal mechanisms. 
-    // For safety, require ADMIN or internal system (not implemented here, so ADMIN)
-    @PreAuthorize("hasRole('ADMIN')")
+    // This allows the user who initiated the transaction (owner of fromAccountId) to execute it.
+    @PreAuthorize("hasRole('ADMIN') or @transactionSecurity.isTransactionOwner(authentication.principal, #request.transactionId)")
     @PostMapping("/transactions/transfer/execution")
     @Operation(summary = "Execute an initiated transfer")
     @ApiResponse(responseCode = "200", description = "Transfer executed",

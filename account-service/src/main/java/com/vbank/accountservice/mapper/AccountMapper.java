@@ -19,6 +19,7 @@ public class AccountMapper {
     public AccountDetailsResponse toDetailsResponse(Account account) {
         return AccountDetailsResponse.builder()
                 .accountId(account.getAccountId())
+                .userId(account.getUserId())
                 .accountNumber(account.getAccountNumber())
                 .accountType(account.getAccountType().name())
                 .balance(account.getBalance())
