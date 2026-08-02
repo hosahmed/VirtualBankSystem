@@ -1,11 +1,14 @@
 package com.vbank.accountservice.client;
 
 import com.vbank.accountservice.exception.UserNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.UUID;
 
@@ -18,6 +21,18 @@ public class UserServiceClient {
     public UserServiceClient(@Value("${user-service.url}") String userServiceUrl) {
         this.restClient = RestClient.builder()
                 .baseUrl(userServiceUrl)
+                .requestInterceptor((request, body, execution) -> {
+                    ServletRequestAttributes attrs =
+                            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+                    if (attrs != null) {
+                        HttpServletRequest servletRequest = attrs.getRequest();
+                        String token = servletRequest.getHeader("X-Auth-Token");
+                        if (token != null) {
+                            request.getHeaders().set("X-Auth-Token", token);
+                        }
+                    }
+                    return execution.execute(request, body);
+                })
                 .build();
     }
 
@@ -29,9 +44,6 @@ public class UserServiceClient {
         try {
             restClient.get()
                     .uri("/users/{userId}/profile", userId)
-                    // Add APP-NAME header to bypass interceptor if necessary, or let BFF handle it.
-                    // Assuming internal calls bypass Gateway, but interceptor still checks APP-NAME unless disabled for internal IPs.
-                    // For now, we'll mimic what was done in AccountServiceClient (which didn't add headers).
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
                         throw new UserNotFoundException("User not found: " + userId);
@@ -45,3 +57,4 @@ public class UserServiceClient {
         }
     }
 }
+

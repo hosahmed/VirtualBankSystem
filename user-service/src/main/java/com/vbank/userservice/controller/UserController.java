@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import java.util.UUID;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/users")
@@ -59,6 +60,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Profile retrieved successfully", content = @Content(schema = @Schema(implementation = UserProfileResponse.class)))
     @ApiResponse(responseCode = "401", description = "Missing or invalid authentication token", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "User not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @PreAuthorize("hasRole('ADMIN') or #userId.toString() == authentication.principal")
     @GetMapping("/{userId}/profile")
     public ResponseEntity<UserProfileResponse> getProfile(
             @Parameter(description = "Target user ID") @PathVariable UUID userId) {

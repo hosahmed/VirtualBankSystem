@@ -6,10 +6,12 @@ import com.vbank.userservice.dto.response.LoginResponse;
 import com.vbank.userservice.dto.response.UserRegisteredResponse;
 import com.vbank.userservice.entity.User;
 import com.vbank.userservice.entity.UserStatus;
+import com.vbank.userservice.entity.Role;
 import com.vbank.userservice.exception.InvalidCredentialsException;
 import com.vbank.userservice.exception.UserAlreadyExistsException;
 import com.vbank.userservice.mapper.UserMapper;
 import com.vbank.userservice.repository.UserRepository;
+import com.vbank.userservice.security.JwtTokenProvider;
 import com.vbank.userservice.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,18 +38,21 @@ class UserServiceImplTest {
         @Mock
         private UserMapper userMapper;
 
+        @Mock
+        private JwtTokenProvider tokenProvider;
+
         private UserServiceImpl userService;
 
         @BeforeEach
         void setUp() {
                 MockitoAnnotations.openMocks(this);
-                userService = new UserServiceImpl(userRepository, passwordEncoder, userMapper);
+                userService = new UserServiceImpl(userRepository, passwordEncoder, userMapper, tokenProvider);
         }
 
         @Test
         void register_shouldHashPasswordAndSaveUser_whenUsernameAndEmailAreUnique() {
                 RegisterRequest request = new RegisterRequest(
-                                "john.doe", "securePassword123", "john.doe@example.com", "John", "Doe");
+                                "john.doe", "securePassword123", "john.doe@example.com", "John", "Doe", "ROLE_USER");
 
                 when(userRepository.existsByUsername("john.doe")).thenReturn(false);
                 when(userRepository.existsByEmail("john.doe@example.com")).thenReturn(false);
@@ -61,6 +66,7 @@ class UserServiceImplTest {
                                 .firstName("John")
                                 .lastName("Doe")
                                 .status(UserStatus.ACTIVE)
+                                .role(Role.ROLE_USER)
                                 .build();
                 when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
@@ -82,7 +88,7 @@ class UserServiceImplTest {
         @Test
         void register_shouldThrowConflict_whenUsernameAlreadyExists() {
                 RegisterRequest request = new RegisterRequest(
-                                "john.doe", "securePassword123", "new@example.com", "John", "Doe");
+                                "john.doe", "securePassword123", "new@example.com", "John", "Doe", "ROLE_USER");
 
                 when(userRepository.existsByUsername("john.doe")).thenReturn(true);
 
@@ -106,16 +112,19 @@ class UserServiceImplTest {
                                 .username("john.doe")
                                 .passwordHash("hashed-password")
                                 .status(UserStatus.ACTIVE)
+                                .role(Role.ROLE_USER)
                                 .build();
 
                 when(userRepository.findByUsername("john.doe")).thenReturn(java.util.Optional.of(user));
                 when(passwordEncoder.matches("securePassword123", "hashed-password")).thenReturn(true);
+                when(tokenProvider.generateToken(user.getUserId(), "ROLE_USER")).thenReturn("mock-jwt-token");
 
                 LoginResponse expected = LoginResponse.builder()
                                 .userId(user.getUserId())
                                 .username("john.doe")
+                                .token("mock-jwt-token")
                                 .build();
-                when(userMapper.toLoginResponse(user)).thenReturn(expected);
+                when(userMapper.toLoginResponse(user, "mock-jwt-token")).thenReturn(expected);
 
                 LoginResponse response = userService.login(request);
 
@@ -142,6 +151,7 @@ class UserServiceImplTest {
                                 .username("john.doe")
                                 .passwordHash("hashed-password")
                                 .status(UserStatus.ACTIVE)
+                                .role(Role.ROLE_USER)
                                 .build();
 
                 when(userRepository.findByUsername("john.doe")).thenReturn(java.util.Optional.of(user));
@@ -161,6 +171,7 @@ class UserServiceImplTest {
                                 .username("john.doe")
                                 .passwordHash("hashed-password")
                                 .status(UserStatus.INACTIVE)
+                                .role(Role.ROLE_USER)
                                 .build();
 
                 when(userRepository.findByUsername("john.doe")).thenReturn(java.util.Optional.of(user));
@@ -183,6 +194,7 @@ class UserServiceImplTest {
                                 .firstName("John")
                                 .lastName("Doe")
                                 .status(UserStatus.ACTIVE)
+                                .role(Role.ROLE_USER)
                                 .build();
 
                 when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));

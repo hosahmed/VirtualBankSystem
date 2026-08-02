@@ -17,10 +17,11 @@ public class UserMapper {
                 .build();
     }
 
-    public LoginResponse toLoginResponse(User user) {
+    public LoginResponse toLoginResponse(User user, String token) {
         return LoginResponse.builder()
                 .userId(user.getUserId())
                 .username(user.getUsername())
+                .token(token)
                 .build();
     }
 

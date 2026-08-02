@@ -5,6 +5,7 @@ import com.vbank.userservice.dto.request.RegisterRequest;
 import com.vbank.userservice.dto.response.LoginResponse;
 import com.vbank.userservice.dto.response.UserProfileResponse;
 import com.vbank.userservice.dto.response.UserRegisteredResponse;
+import com.vbank.userservice.entity.Role;
 import com.vbank.userservice.entity.User;
 import com.vbank.userservice.entity.UserStatus;
 import com.vbank.userservice.exception.InvalidCredentialsException;
@@ -12,6 +13,7 @@ import com.vbank.userservice.exception.UserAlreadyExistsException;
 import com.vbank.userservice.exception.UserNotFoundException;
 import com.vbank.userservice.mapper.UserMapper;
 import com.vbank.userservice.repository.UserRepository;
+import com.vbank.userservice.security.JwtTokenProvider;
 import com.vbank.userservice.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,13 +28,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final JwtTokenProvider tokenProvider;
 
     public UserServiceImpl(UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            UserMapper userMapper) {
+            UserMapper userMapper,
+            JwtTokenProvider tokenProvider) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+        this.tokenProvider = tokenProvider;
     }
 
     @Override
@@ -49,6 +54,15 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException("Username or email already exists.");
         }
 
+        Role role = Role.ROLE_USER;
+        if (request.getRole() != null) {
+            try {
+                role = Role.valueOf(request.getRole());
+            } catch (IllegalArgumentException e) {
+                // Default to ROLE_USER if invalid
+            }
+        }
+
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -56,6 +70,7 @@ public class UserServiceImpl implements UserService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .status(UserStatus.ACTIVE)
+                .role(role)
                 .build();
 
         User saved = userRepository.save(user);
@@ -77,7 +92,9 @@ public class UserServiceImpl implements UserService {
             throw new InvalidCredentialsException("Invalid username or password.");
         }
 
-        return userMapper.toLoginResponse(user);
+        String token = tokenProvider.generateToken(user.getUserId(), user.getRole().name());
+
+        return userMapper.toLoginResponse(user, token);
     }
 
 

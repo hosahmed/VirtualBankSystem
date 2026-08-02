@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,6 +34,7 @@ public class LogController {
     public LogController(LogEntryService logEntryService) {
         this.logEntryService = logEntryService;
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     @Operation(summary = "List log entries",
             description = "Optionally filter by messageType (Request/Response). Paginated.")
@@ -51,6 +53,7 @@ public class LogController {
         return ResponseEntity.ok(page);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     @Operation(summary = "Test log ingestion",
             description = "Manually push a log message via HTTP as if it came from Kafka")

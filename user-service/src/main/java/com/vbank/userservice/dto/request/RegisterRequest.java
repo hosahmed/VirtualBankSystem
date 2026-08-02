@@ -41,4 +41,7 @@ public class RegisterRequest {
     @Size(max = 50)
     @Schema(example = "Doe")
     private String lastName;
+
+    @Schema(example = "ROLE_USER", description = "User role (ROLE_USER or ROLE_ADMIN)")
+    private String role;
 }

@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @transactionSecurity.isOwner(authentication.principal, #request.fromAccountId)")
     @PostMapping("/transactions/transfer/initiation")
     @Operation(summary = "Initiate a fund transfer")
     @ApiResponse(responseCode = "200", description = "Transfer initiated",
@@ -41,6 +43,10 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 
+    // This is an internal-only endpoint called by the Saga orchestrator or directly, 
+    // but in our simplified architecture we might allow ADMIN to execute or it's called by internal mechanisms. 
+    // For safety, require ADMIN or internal system (not implemented here, so ADMIN)
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/transactions/transfer/execution")
     @Operation(summary = "Execute an initiated transfer")
     @ApiResponse(responseCode = "200", description = "Transfer executed",
@@ -53,6 +59,7 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @transactionSecurity.isOwner(authentication.principal, #accountId)")
     @GetMapping("/accounts/{accountId}/transactions")
     @Operation(summary = "Get transaction history for an account")
     @ApiResponse(responseCode = "200", description = "Transaction history")

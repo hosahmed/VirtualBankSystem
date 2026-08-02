@@ -20,7 +20,38 @@ public class AccountServiceClient {
     public AccountServiceClient(@Value("${account-service.url}") String accountServiceUrl) {
         this.restClient = RestClient.builder()
                 .baseUrl(accountServiceUrl)
+                .requestInterceptor((request, body, execution) -> {
+                    org.springframework.web.context.request.RequestAttributes attributes = org.springframework.web.context.request.RequestContextHolder.getRequestAttributes();
+                    if (attributes instanceof org.springframework.web.context.request.ServletRequestAttributes) {
+                        jakarta.servlet.http.HttpServletRequest servletRequest = ((org.springframework.web.context.request.ServletRequestAttributes) attributes).getRequest();
+                        String token = servletRequest.getHeader("X-Auth-Token");
+                        if (token != null) {
+                            request.getHeaders().add("X-Auth-Token", token);
+                        }
+                    }
+                    return execution.execute(request, body);
+                })
                 .build();
+    }
+
+    /**
+     * Retrieves account details to verify ownership.
+     */
+    public Map<String, Object> getAccount(UUID accountId) {
+        try {
+            return restClient.get()
+                    .uri("/accounts/{accountId}", accountId)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                        throw new InvalidTransactionException("Account not found: " + accountId);
+                    })
+                    .body(new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {});
+        } catch (InvalidTransactionException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving account {}: {}", accountId, e.getMessage());
+            throw new InvalidTransactionException("Failed to retrieve account: " + accountId);
+        }
     }
 
     /**
@@ -28,20 +59,7 @@ public class AccountServiceClient {
      * Throws InvalidTransactionException if the account is not found.
      */
     public void validateAccountExists(UUID accountId) {
-        try {
-            restClient.get()
-                    .uri("/accounts/{accountId}", accountId)
-                    .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                        throw new InvalidTransactionException("Account not found: " + accountId);
-                    })
-                    .toBodilessEntity();
-        } catch (InvalidTransactionException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Error validating account {}: {}", accountId, e.getMessage());
-            throw new InvalidTransactionException("Failed to validate account: " + accountId);
-        }
+        getAccount(accountId);
     }
 
     /**

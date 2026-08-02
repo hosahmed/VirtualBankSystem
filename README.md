@@ -53,6 +53,13 @@ When running locally via Docker, the services map to the following ports:
 - **Logging Service**: `http://localhost:8085`
 - **WSO2 Gateway**: `https://localhost:8243`
 
+## 🛡️ Security Architecture
+
+The application implements a robust **2-Token Security Approach**:
+1. **WSO2 API Gateway**: Secures external access using OAuth2 Bearer tokens.
+2. **Internal Stateless RBAC**: Microservices enforce a Default Deny policy. When a user authenticates (`/users/login`), the User Service issues an internal JWT containing their identity and Role (`ROLE_USER` or `ROLE_ADMIN`).
+3. **Data Privacy**: Endpoints are strictly protected using Spring Security's `@PreAuthorize` to ensure users can only access their own accounts and initiate transactions from accounts they own.
+
 ## 🛡️ WSO2 API Manager Setup
 
 To properly secure the application, you must import the APIs into WSO2 and set up the Gateway:
@@ -60,13 +67,13 @@ To properly secure the application, you must import the APIs into WSO2 and set u
 1. Start your local WSO2 API Manager instance (`api-manager.bat` / `api-manager.sh`).
 2. Log into the **Publisher Portal** (`https://localhost:9443/publisher`).
 3. Import the OpenAPI definitions from the running microservices (e.g., `http://localhost:8081/v3/api-docs`).
-4. **Important**: Delete internal endpoints from the public APIs to maintain architectural security (e.g., remove the profile fetch endpoint from the public `RegisterAPI`).
+4. **Important**: Ensure the WSO2 gateway is configured to pass the custom `X-Auth-Token` header for authenticated requests.
 5. Create the `vbank` **API Product** to group the exposed endpoints together.
 6. Log into the **Developer Portal**, subscribe to the `vbank` product, and generate your OAuth Access Token.
 
 ## 🧪 Testing
 
 You can test the application natively through **Postman**:
-1. Import the `.json` file into Postman.
-2. Configure your Bearer Token in the Authorization tab.
-
+1. Import the provided WSO2 APIs/Products into your environment.
+2. Configure your Bearer Token in the Authorization tab for WSO2.
+3. Login using the `/users/login` endpoint to receive your internal `X-Auth-Token`. Pass this token in the headers for all subsequent requests to protected endpoints.

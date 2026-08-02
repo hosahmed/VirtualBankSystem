@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class AccountController {
         this.accountService = accountService;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #request.userId.toString() == authentication.principal")
     @PostMapping("/accounts")
     @Operation(summary = "Create a new bank account")
     @ApiResponse(responseCode = "201", description = "Account created",
@@ -41,6 +43,7 @@ public class AccountController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.isOwner(authentication.principal, #accountId)")
     @GetMapping("/accounts/{accountId}")
     @Operation(summary = "Get account details by ID")
     @ApiResponse(responseCode = "200", description = "Account details",
@@ -52,6 +55,7 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #userId.toString() == authentication.principal")
     @GetMapping("/users/{userId}/accounts")
     @Operation(summary = "List all accounts for a user")
     @ApiResponse(responseCode = "200", description = "List of accounts")
@@ -62,6 +66,7 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accountSecurity.isOwner(authentication.principal, #request.fromAccountId)")
     @PutMapping("/accounts/transfer")
     @Operation(summary = "Transfer funds between accounts")
     @ApiResponse(responseCode = "200", description = "Transfer completed",
