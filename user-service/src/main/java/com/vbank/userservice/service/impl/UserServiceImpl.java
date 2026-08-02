@@ -56,10 +56,16 @@ public class UserServiceImpl implements UserService {
 
         Role role = Role.ROLE_USER;
         if (request.getRole() != null) {
-            try {
-                role = Role.valueOf(request.getRole());
-            } catch (IllegalArgumentException e) {
-                // Default to ROLE_USER if invalid
+            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            boolean isAdmin = auth != null && auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                    
+            if (isAdmin) {
+                try {
+                    role = Role.valueOf(request.getRole());
+                } catch (IllegalArgumentException e) {
+                    // Default to ROLE_USER if invalid
+                }
             }
         }
 
