@@ -13,14 +13,7 @@
           "name": "Register",
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{Token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "POST",
             "header": [
@@ -66,16 +59,23 @@
         },
         {
           "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();\r",
+                  "pm.collectionVariables.set(\"auth_token\", res.token);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{Token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "POST",
             "header": [
@@ -95,7 +95,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"string\",\n  \"password\": \"string\"\n}",
+              "raw": "{\n  \"username\": \"Admin\",\n  \"password\": \"P@SSW0RD\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -123,14 +123,7 @@
           "name": "Get User Profile",
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{Token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "GET",
             "header": [
@@ -171,14 +164,7 @@
           "name": "Transfer Funds",
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{Token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "PUT",
             "header": [
@@ -226,14 +212,7 @@
           "name": "Create New Bank Account",
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{Token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "POST",
             "header": [
@@ -253,7 +232,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": \"a1b2c3d4-e5f6-7890-1234-567890abcdef\",\n  \"accountType\": \"SAVINGS\",\n  \"initialBalance\": 100\n}",
+              "raw": "{\n  \"userId\": \"7d9f0704-db89-49b1-91e4-99ce63f93442\",\n  \"accountType\": \"SAVINGS\",\n  \"initialBalance\": 1000000\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -280,14 +259,7 @@
           "name": "Get All Accounts For UserId",
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{Token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "GET",
             "header": [
@@ -323,14 +295,7 @@
           "name": "Get Account Details",
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{Token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "GET",
             "header": [
@@ -370,14 +335,7 @@
           "name": "Initiate Transaction",
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{Token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "POST",
             "header": [
@@ -426,14 +384,7 @@
           "name": "Execute Transaction",
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{Token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "POST",
             "header": [
@@ -482,14 +433,7 @@
           "name": "Get Transaction History",
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{Token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "GET",
             "header": [
@@ -530,14 +474,7 @@
           "name": "List log entries",
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{Token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "GET",
             "header": [
@@ -588,14 +525,7 @@
           "name": "Test log ingestion",
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{Token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "POST",
             "header": [
@@ -615,7 +545,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"empty\": true,\n    \"message\": \"Test\",\n    \"messageType\": \"Request\",\n    \"dateTime\": \"2026-07-30T13:53:59.234091Z\"\n}",
+              "raw": "{\n    \"message\": \"Test\",\n    \"messageType\": \"Request\",\n    \"dateTime\": \"2026-07-30T13:53:59.234091Z\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -648,14 +578,7 @@
           "name": "Dashboard",
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{Token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "GET",
             "header": [
@@ -692,6 +615,18 @@
     },
     {
       "name": "Get Admin Access Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.collectionVariables.set(\"wso2_token\", jsonData.access_token);"
+            ]
+          }
+        }
+      ],
       "request": {
         "auth": {
           "type": "basic",
@@ -744,6 +679,40 @@
         }
       },
       "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "requests": {},
+        "exec": [
+          "pm.request.headers.upsert({key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('wso2_token')});",
+          "pm.request.headers.upsert({key: 'X-Auth-Token', value: pm.collectionVariables.get('auth_token')});"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "wso2_token",
+      "value": ""
+    },
+    {
+      "key": "auth_token",
+      "value": ""
     }
   ]
 }

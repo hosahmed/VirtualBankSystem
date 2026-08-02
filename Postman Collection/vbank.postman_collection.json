@@ -8,6 +8,18 @@
   "item": [
     {
       "name": "Get Portal Access Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.collectionVariables.set(\"wso2_token\", jsonData.access_token);"
+            ]
+          }
+        }
+      ],
       "request": {
         "auth": {
           "type": "basic",
@@ -63,6 +75,20 @@
     },
     {
       "name": "Get Mobile Access Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.collectionVariables.set(\"wso2_token\", jsonData.access_token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "auth": {
           "type": "basic",
@@ -120,14 +146,7 @@
       "name": "Initiate Transaction",
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{Token}}",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "POST",
         "header": [
@@ -147,7 +166,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"fromAccountId\": \"98248322-7a75-4b8c-874d-f08b0a665f62\",\n  \"toAccountId\": \"694a5030-ed95-4a1a-8415-82b5db3fede0\",\n  \"amount\": 30,\n  \"description\": \"Transfer to checking account\"\n}",
+          "raw": "{\n  \"fromAccountId\": \"0f61c61d-824b-4c4c-8f18-11b968ad2016\",\n  \"toAccountId\": \"694a5030-ed95-4a1a-8415-82b5db3fede0\",\n  \"amount\": 30,\n  \"description\": \"Transfer to checking account\"\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -176,14 +195,7 @@
       "name": "Execute Transaction",
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{Token}}",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "POST",
         "header": [
@@ -203,7 +215,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"transactionId\": \"280204a3-ab28-4c3d-ab8f-905fbfc65fad\"\n}",
+          "raw": "{\n  \"transactionId\": \"257a2ad6-67ce-4551-b8cd-658574c15efb\"\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -232,14 +244,7 @@
       "name": "BFF Dashboard",
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{Token}}",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "GET",
         "header": [
@@ -273,16 +278,23 @@
     },
     {
       "name": "Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var res = pm.response.json();\r",
+              "pm.collectionVariables.set(\"auth_token\", res.token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{Token}}",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "POST",
         "header": [
@@ -302,7 +314,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"username\": \"Hossam Tag\",\n  \"password\": \"@2a2h1m684217935\"\n}",
+          "raw": "{\n  \"username\": \"Hossam3\",\n  \"password\": \"12345678\"\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -330,14 +342,7 @@
       "name": "Register",
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{Token}}",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "POST",
         "header": [
@@ -357,7 +362,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"username\": \"john.doe\",\n  \"password\": \"securePassword123\",\n  \"email\": \"john.doe@example.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}",
+          "raw": "{\n  \"username\": \"Hossam3\",\n  \"password\": \"12345678\",\n  \"email\": \"hossam3@gmail.com\",\n  \"firstName\": \"Hossam\",\n  \"lastName\": \"Ahmed\"\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -382,13 +387,37 @@
       "response": []
     }
   ],
-  "variable": [
+  "event": [
     {
-      "key": "auth_password_174s",
-      "secret": true
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "requests": {},
+        "exec": [
+          "pm.request.headers.upsert({key: 'Authorization', value: 'Bearer ' + pm.collectionVariables.get('wso2_token')});",
+          "pm.request.headers.upsert({key: 'X-Auth-Token', value: pm.collectionVariables.get('auth_token')});"
+        ]
+      }
     },
     {
-      "key": "Secret Key",
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "wso2_token",
+      "value": ""
+    },
+    {
+      "key": "auth_token",
       "value": ""
     }
   ]
